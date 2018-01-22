@@ -1,27 +1,85 @@
 package kkimsangheon.virtualtradecoin;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+
 /**
  * Created by SangHeon on 2018-01-21.
  */
 
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.net.URL;
+import java.util.Date;
+
 public class FragmentTab extends Fragment {
+    TextView textView;
+    BackgroundTask task;
+    int value;
+    String temp=null;
+    FragmentTab fragmentTab = this;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_layout, container, false);
-        TextView tv = (TextView) v.findViewById(R.id.text);
-        tv.setText(this.getTag() + " Content");
+        textView = (TextView) v.findViewById(R.id.text);
+        temp = fragmentTab.getTag();
+
+        if(task != null){
+            task.cancel(true);
+            return v;
+        }
+
+        task = new BackgroundTask();
+        task.execute(100);
+
+
         return v;
     }
+
+    class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
+        protected void onPreExecute() {
+            value = 0;
+        }
+
+        protected Integer doInBackground(Integer... values) {
+            while (isCancelled() == false) {
+                publishProgress(value);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                }
+            }
+            return value;
+        }
+
+        protected void onProgressUpdate(Integer... values) {
+            if (isCancelled() == false) {
+                textView.setText(temp + "Current Value : " + values[0].toString() + new Date());
+            }
+        }
+
+        protected void onPostExecute(Integer result) {
+            textView.setText("Finished.");
+        }
+
+        protected void onCancelled() {
+            textView.setText("Cancelled.");
+        }
+    }
+
 }
