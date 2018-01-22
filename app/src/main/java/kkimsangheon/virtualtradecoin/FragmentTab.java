@@ -22,7 +22,7 @@ public class FragmentTab extends Fragment {
     int value;
     String temp=null;
     FragmentTab fragmentTab = this;
-
+    View view = null;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +36,17 @@ public class FragmentTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_layout, container, false);
-        textView = (TextView) v.findViewById(R.id.text);
+        view = v;
+
         temp = fragmentTab.getTag();
 
         if(task != null){
             task.cancel(true);
-            return v;
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         task = new BackgroundTask();
@@ -69,6 +74,8 @@ public class FragmentTab extends Fragment {
 
         protected void onProgressUpdate(Integer... values) {
             if (isCancelled() == false) {
+                textView = (TextView) view.findViewById(R.id.text);
+
                 textView.setText(temp + "Current Value : " + values[0].toString() + new Date());
             }
         }
